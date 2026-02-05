@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import PostgresDsn
 
 
-class Seettings(BaseSettings):
+class Settings(BaseSettings):
     
     # Настройки Postgres
     POSTGRES_USER: str
@@ -13,14 +13,14 @@ class Seettings(BaseSettings):
 
     # База данных PostgreSQL
     @property
-    def async_database_url(self) -> PostgresDsn:
+    def async_database_url(self) -> str:
         return str(PostgresDsn.build(
             scheme="postgresql+asyncpg",
             username=self.POSTGRES_USER,
             password=self.POSTGRES_PASSWORD,
             host=self.POSTGRES_HOST,
             port=self.POSTGRES_PORT,
-            path={self.POSTGRES_DB},
+            path=self.POSTGRES_DB,
         ))
 
     # Настройки Redis/Celery
@@ -36,5 +36,5 @@ class Seettings(BaseSettings):
     )
 
 # Инициализация
-settings = Seettings()
+settings = Settings()
 
