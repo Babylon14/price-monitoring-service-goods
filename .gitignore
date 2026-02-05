@@ -1,0 +1,60 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- Environment Secrets (КРИТИЧНО) ---
+.env
+.venv
+venv/
+ENV/
+env.bak
+.env.local
+.env.dev
+.env.test
+.env.prod
+
+# --- Docker & Databases ---
+# Не игнорируем саму папку, но игнорируем данные внутри, 
+# если ты решишь монтировать их в корень проекта
+postgres_data/
+pgadmin_data/
+redis_data/
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# --- Monitoring & Logs ---
+*.log
+prometheus/data/
+grafana/data/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
