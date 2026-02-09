@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from app.models.product import Product
 
@@ -24,6 +24,10 @@ class ProductRepository:
         return instance
 
 
-    
+    async def update_price(self, product_id: int, new_price: float):
+        """Метод для обновления цены продукта"""
+        query = update(Product).where(Product.id == product_id).values(current_price=new_price)
+        await self.db.execute(query)
+        await self.db.commit()
 
 

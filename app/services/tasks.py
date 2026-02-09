@@ -1,25 +1,44 @@
 import asyncio
-import random
+import time
+import logging
 
 from app.core.celery_app import celery_app
-from app.database import get_db
+from app.database import async_session_factory
 from app.repositories.product_repository import ProductRepository
+from app.services.parser import get_product_price
 
 
-@celery_app.task(name="update_product_price")
-def update_product_price(product_id: int):
+logger = logging.getLogger(__name__)
+
+@celery_app.task(name="update_product_price_task")
+def update_product_price_task(product_id: int, url: str):
     """Задача для обновления цены продукта"""
+    # Замеряем время старта
+    start_time = time.perf_counter()
+
+    # Запускаем асинхронный парсинг внутри синхронного Celery
     loop = asyncio.get_event_loop()
-    return loop.run_until_complete(_async_update_price(product_id))
+    price = loop.run_until_complete(_async_update_price(product_id))
+
+    # Замеряем время окончания
+    duration = time.perf_counter() - start_time
+    logger.info(f"--- Задача ID {product_id} выполнена за {duration:.2f} сек. Цена: {price} ---")
     
 
-async def _async_update_price(product_id: int):
-    db = await get_db()
-    repo = ProductRepository(db)
-    await asyncio.sleep(2)
-    new_price = random.uniform(50000, 150000)
+async def _async_update_price(product_id: int, url: str):
+    # Фабрика сессий
+    async with async_session_factory() as db:
+        repo = ProductRepository(db)
 
-    # Тут будет логика обновления в БД через репозиторий
-        # await repo.update_price(product_id, new_price)
-    print(f"!!! ПАРСЕР: Товар {product_id} обновлен. Цена: {new_price}")
+        # 2. Вызываем парсинг (из app/services/parser.py)
+        # Если парсер вернет None, цена в базе останется прежней
+        new_price = get_product_price(url)
+
+        if new_price is not None:
+            await repo.update_price(product_id, new_price)
+            return new_price
+        
+        logger.warning(f"Не удалось получить цену для товара {product_id}")
+        return None   
+
 

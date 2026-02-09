@@ -4,11 +4,11 @@ from app.core.config import settings
 
 
 # Используем URL из конфига
-endine = create_async_engine(settings.async_database_url, echo=True)
+engine = create_async_engine(settings.async_database_url, echo=True)
 
 # Создаем асинхронную фабрику сессии
 async_session_factory = async_sessionmaker(
-    bind=endine,
+    bind=engine,
     class_=AsyncSession,
     expire_on_commit=False
 )
