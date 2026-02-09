@@ -1,5 +1,6 @@
 from app.repositories.product_repository import ProductRepository
 from app.schemas.schema_product import ProductCreate, ProductResponse
+from app.services.tasks import update_product_price
 
 
 class ProductService:
@@ -20,9 +21,8 @@ class ProductService:
         # Сохраняем продукт 
         product = await self.repository.create(**clean_data)
 
-        # ЛОГИКА с вызовом Celery будет описана позже...
-        # celery_app.send_task("parse_price", args=[product.id])
-
+        # Отправляем задачу в Celery (не ждем выполнения!)
+        update_product_price.delay(product.id)
         return product
 
 
