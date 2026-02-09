@@ -11,7 +11,7 @@ class ProductRepository:
 
     async def get_by_url(self, url: str) -> Product | None:
         """Метод для получения продукта по url"""
-        result = await self.db.execute(select(Product).where(Product.url == url))
+        result = await self.db.execute(select(Product).where(Product.url == str(url)))
         return result.scalar_one_or_none()
     
     
