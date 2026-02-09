@@ -10,11 +10,28 @@ ua = UserAgent()
 async def get_product_price(url: str) -> float | None:
     headers = {
         "User-Agent": ua.random,
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,webp,*/*;q=0.8",
-        "Accept-Language": "ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,webp,*/ *;q=0.8",
+        "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Accept-Encoding": "gzip, deflate, br",
+        "DNT": "1", # Do Not Track
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "Cache-Control": "max-age=0",
     }
     
-    async with httpx.AsyncClient(headers=headers, follow_redirects=True, timeout=15.0) as client:
+    cookies = {"city-path": "moscow"} # Пример для Москвы
+
+    async with httpx.AsyncClient(
+        headers=headers,
+        cookies=cookies, 
+        follow_redirects=True, 
+        timeout=15.0,
+        http2=True # Попробуем протокол HTTP/2, он сейчас стандарт для браузеров
+        ) as client:
         try:
             response = await client.get(url)
             if response.status_code != 200:
